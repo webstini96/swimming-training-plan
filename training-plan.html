@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Jack's Training Plan</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #111215;
+    --surface: #1a1d22;
+    --surface2: #20242b;
+    --border: #2a2d35;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --teal: #00d4c8;
+    --teal-dim: rgba(0,212,200,0.10);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.10);
+    --red-dim: rgba(239,68,68,0.10);
+    --slate: #64748b;
+    --slate-dim: rgba(100,116,139,0.12);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.10);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 28px 16px 80px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .header { margin-bottom: 24px; }
+  .header-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .header h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+  .header h1 span { color: var(--teal); }
+  .header-sub { margin-top: 7px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* TABS */
+  .tab-bar { display: flex; gap: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 18px; }
+  .tab-btn { flex: 1; padding: 8px 2px; border: none; background: transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .tab-btn.active { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* LOAD BARS */
+  .load-arc { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 16px 16px; margin-bottom: 14px; }
+  .widget-title { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+  .load-bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; align-items: flex-end; height: 60px; }
+  .load-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; height: 100%; justify-content: flex-end; }
+  .load-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 3px; }
+  .load-day-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+
+  /* KNEE NOTICE */
+  .knee-notice { background: var(--red-dim); border: 1px solid rgba(239,68,68,0.22); border-radius: 12px; padding: 11px 13px; margin-bottom: 14px; display: flex; gap: 9px; }
+  .knee-notice-text { font-size: 12px; color: #f87171; line-height: 1.6; }
+  .knee-notice-text strong { color: #fca5a5; font-weight: 500; }
+
+  .section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+
+  /* DAY CARDS */
+  .day-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 8px; overflow: hidden; }
+  .day-header { display: flex; align-items: center; gap: 10px; padding: 13px 15px; cursor: pointer; user-select: none; }
+  .day-tag { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; padding: 3px 7px; border-radius: 5px; flex-shrink: 0; min-width: 34px; text-align: center; }
+  .day-title { flex: 1; font-size: 13px; font-weight: 500; }
+  .day-badges { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .badge { font-size: 9.5px; padding: 2px 7px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+  .expand-icon { font-size: 12px; color: var(--muted); flex-shrink: 0; transition: transform 0.22s; }
+  .day-card.open .expand-icon { transform: rotate(180deg); }
+  .day-body { display: none; padding: 13px 15px 15px; border-top: 1px solid var(--border); }
+  .day-card.open .day-body { display: block; }
+
+  .block { margin-bottom: 13px; }
+  .block:last-child { margin-bottom: 0; }
+  .block-title { font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.13em; text-transform: uppercase; margin-bottom: 7px; opacity: 0.85; }
+
+  .ex-list { list-style: none; }
+  .ex-list li { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; padding: 4px 0; border-bottom: 1px solid var(--border); color: #d1d5db; flex-wrap: wrap; }
+  .ex-list li:last-child { border-bottom: none; }
+  .ex-name { flex: 1; min-width: 130px; }
+  .ex-sets { font-family: 'DM Mono', monospace; font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+  .ex-note { font-size: 11px; color: var(--muted); font-style: italic; width: 100%; line-height: 1.5; padding-bottom: 2px; }
+
+  .note-box { background: rgba(255,255,255,0.025); border-left: 2px solid var(--border); border-radius: 0 6px 6px 0; padding: 9px 11px; font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 10px; }
+  .note-box strong { color: #9ca3af; font-weight: 500; }
+
+  /* LOG BUTTON inside day card */
+  .log-session-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-top: 12px; padding: 10px; background: var(--teal-dim); border: 1px solid rgba(0,212,200,0.25); border-radius: 9px; color: var(--teal); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .log-session-btn:hover { background: rgba(0,212,200,0.18); }
+
+  /* colour variants */
+  .mt .day-tag { background: var(--amber-dim); color: var(--amber); }
+  .mt .day-title { color: var(--amber); }
+  .mt .block-title { color: var(--amber); }
+  .mt.day-card { border-color: rgba(245,158,11,0.18); }
+  .sw .day-tag { background: var(--teal-dim); color: var(--teal); }
+  .sw .day-title { color: var(--teal); }
+  .sw .block-title { color: var(--teal); }
+  .sw.day-card { border-color: rgba(0,212,200,0.18); }
+  .gym-sw .day-tag { background: var(--purple-dim); color: var(--purple); }
+  .gym-sw .day-title { color: var(--purple); }
+  .gym-sw .block-title { color: var(--purple); }
+  .gym-sw.day-card { border-color: rgba(167,139,250,0.18); }
+  .gs .day-tag { background: var(--green-dim); color: var(--green); }
+  .gs .day-title { color: var(--green); }
+  .gs .block-title { color: var(--green); }
+  .gs.day-card { border-color: rgba(34,197,94,0.18); }
+  .rest .day-tag { background: var(--slate-dim); color: var(--slate); }
+  .rest .day-title { color: var(--slate); }
+  .rest.day-card { border-color: rgba(100,116,139,0.18); }
+
+  .badge-mt { background: var(--amber-dim); color: var(--amber); }
+  .badge-sw { background: var(--teal-dim); color: var(--teal); }
+  .badge-gym { background: var(--green-dim); color: var(--green); }
+  .badge-rest { background: var(--slate-dim); color: var(--slate); }
+  .badge-walk { background: var(--purple-dim); color: var(--purple); }
+  .badge-cycle { background: rgba(251,191,36,0.1); color: #fbbf24; }
+  .badge-gym2 { background: var(--purple-dim); color: var(--purple); }
+
+  /* ── SWIM PHASES ── */
+  .phase-nav { display: flex; gap: 4px; margin-bottom: 13px; }
+  .phase-btn { flex: 1; padding: 8px 3px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.04em; text-transform: uppercase; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-align: center; line-height: 1.4; }
+  .phase-btn.active { background: var(--teal-dim); border-color: rgba(0,212,200,0.3); color: var(--teal); }
+  .phase-panel { display: none; }
+  .phase-panel.active { display: block; }
+  .phase-header { background: var(--teal-dim); border: 1px solid rgba(0,212,200,0.18); border-radius: 12px; padding: 13px 15px; margin-bottom: 11px; }
+  .phase-header h3 { font-size: 14px; font-weight: 600; color: var(--teal); margin-bottom: 3px; }
+  .phase-header p { font-size: 12px; color: #9ca3af; line-height: 1.5; }
+  .phase-goal { display: inline-block; background: rgba(0,212,200,0.15); color: var(--teal); font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 4px; margin-top: 6px; }
+
+  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 7px; overflow: hidden; }
+  .session-header { display: flex; align-items: center; gap: 9px; padding: 11px 13px; cursor: pointer; user-select: none; }
+  .session-day-tag { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 4px; background: var(--teal-dim); color: var(--teal); flex-shrink: 0; }
+  .session-title { flex: 1; font-size: 12.5px; font-weight: 500; }
+  .session-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+  .session-expand { font-size: 11px; color: var(--muted); transition: transform 0.2s; }
+  .session-card.open .session-expand { transform: rotate(180deg); }
+  .session-body { display: none; padding: 0 13px 13px; border-top: 1px solid var(--border); padding-top: 11px; }
+  .session-card.open .session-body { display: block; }
+
+  .set-block { margin-bottom: 9px; padding: 9px 11px; background: rgba(0,212,200,0.04); border: 1px solid rgba(0,212,200,0.1); border-radius: 8px; }
+  .set-block:last-child { margin-bottom: 0; }
+  .set-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); opacity: 0.7; margin-bottom: 7px; }
+  .set-rows { list-style: none; }
+  .set-rows li { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px solid rgba(0,212,200,0.07); color: #d1d5db; gap: 8px; }
+  .set-rows li:last-child { border-bottom: none; }
+  .set-rows li span:last-child { font-family: 'DM Mono', monospace; font-size: 10.5px; color: var(--teal); opacity: 0.7; white-space: nowrap; }
+  .set-cue { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 7px; padding-top: 7px; border-top: 1px solid rgba(0,212,200,0.07); line-height: 1.55; }
+  .set-total { font-family: 'DM Mono', monospace; font-size: 10.5px; color: var(--teal); text-align: right; margin-top: 7px; opacity: 0.85; }
+
+  .milestone-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; margin-top: 10px; display: flex; align-items: flex-start; gap: 9px; }
+  .milestone-icon { font-size: 17px; flex-shrink: 0; }
+  .milestone-text h4 { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+  .milestone-text p { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* ── LOG MODAL ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: flex-end; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #1a1d22; border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 24px 20px 36px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .form-row { margin-bottom: 14px; }
+  .form-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
+  .form-input, .form-textarea, .form-select {
+    width: 100%; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--teal); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-select option { background: #1a1d22; }
+  .rating-row { display: flex; gap: 8px; }
+  .rating-btn { flex: 1; padding: 10px 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; color: var(--muted); font-size: 18px; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .rating-btn.selected { border-color: var(--teal); background: var(--teal-dim); }
+  .modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .btn-primary { flex: 1; padding: 13px; background: var(--teal); border: none; border-radius: 10px; color: #111; font-weight: 600; font-size: 14px; cursor: pointer; }
+  .btn-secondary { padding: 13px 20px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: var(--muted); font-size: 14px; cursor: pointer; }
+
+  /* ── PROGRESS TAB ── */
+  .progress-header { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 12px; text-align: center; }
+  .stat-number { font-size: 24px; font-weight: 600; color: var(--teal); font-family: 'DM Mono', monospace; }
+  .stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; font-family: 'DM Mono', monospace; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* swim progress chart */
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-top: 12px; }
+  .chart-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .chart-bar-fill { width: 100%; border-radius: 3px 3px 0 0; background: var(--teal); opacity: 0.7; min-height: 2px; transition: height 0.3s; }
+  .chart-bar-lbl { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--muted); text-align: center; }
+
+  /* LOG ENTRIES */
+  .log-entry { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; margin-bottom: 8px; }
+  .log-entry-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .log-entry-title { font-size: 13px; font-weight: 500; }
+  .log-entry-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; }
+  .log-entry-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+  .log-tag { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 7px; border-radius: 4px; }
+  .log-notes { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .log-delete { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 2px 4px; flex-shrink: 0; }
+  .log-delete:hover { color: #ef4444; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .empty-state p { font-size: 13px; line-height: 1.6; }
+
+  .principles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+  @media (max-width: 380px) { .principles-grid { grid-template-columns: 1fr; } .phase-nav { flex-wrap: wrap; } }
+  .principle-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; }
+  .principle-card h4 { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+  .principle-card p { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* quick log fab */
+  .fab { position: fixed; bottom: 24px; right: 20px; width: 52px; height: 52px; background: var(--teal); border: none; border-radius: 50%; font-size: 22px; color: #111; cursor: pointer; box-shadow: 0 4px 20px rgba(0,212,200,0.35); z-index: 50; display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Weekly Training Plan</div>
+  <h1>Strength · <span>Freestyle</span> · Muay Thai</h1>
+  <p class="header-sub">Beginner swim progression · Knee-aware · Two gym days</p>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('weekly',this)">Plan</button>
+  <button class="tab-btn" onclick="switchTab('swim',this)">Swim</button>
+  <button class="tab-btn" onclick="switchTab('progress',this)">Progress</button>
+  <button class="tab-btn" onclick="switchTab('principles',this)">Rules</button>
+</div>
+
+<!-- ══ TAB: WEEKLY PLAN ══ -->
+<div class="panel active" id="tab-weekly">
+  <div class="load-arc">
+    <div class="widget-title">Weekly Load Distribution</div>
+    <div class="load-bars" id="loadBars"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--slate)"></div>Rest</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Muay Thai</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Swim</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Gym+Swim</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Gym+Swim (main)</div>
+    </div>
+  </div>
+
+  <div class="knee-notice">
+    <div style="font-size:15px;flex-shrink:0;margin-top:1px">⚠️</div>
+    <div class="knee-notice-text"><strong>Bilateral knee protocol:</strong> No ACL left — no cutting, pivoting, deep single-leg loading. No lateral meniscus right — no deep flexion under load. <strong>Two-beat kick only. No breaststroke. Sharp pain = stop.</strong></div>
+  </div>
+
+  <div class="section-label">Daily breakdown — tap to expand</div>
+
+  <div class="day-card rest" onclick="toggle(this)">
+    <div class="day-header">
+      <div class="day-tag">MON</div><div class="day-title">Full Rest + Recovery</div>
+      <div class="day-badges"><span class="badge badge-rest">Rest</span></div><div class="expand-icon">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="block"><div class="block-title" style="color:var(--slate)">Optional — 10 min only</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Hip flexor + glute stretch</span><span class="ex-sets">passive, 2 min</span></li>
+          <li><span class="ex-name">Foam roll — quads, thoracic spine</span><span class="ex-sets">8 min</span></li>
+        </ul>
+      </div>
+      <div class="note-box"><strong>Logic:</strong> Three MT sessions Tue–Fri. Monday is the only full CNS reset. Eat at maintenance, prioritise sleep.</div>
+      <button class="log-session-btn" onclick="openLog(event,'Monday — Rest')">+ Log this session</button>
+    </div>
+  </div>
+
+  <div class="day-card mt" onclick="toggle(this)">
+    <div class="day-header">
+      <div class="day-tag">TUE</div><div class="day-title">Muay Thai Fighters + Office</div>
+      <div class="day-badges"><span class="badge badge-mt">Muay Thai</span><span class="badge badge-walk">Walking</span></div><div class="expand-icon">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="block"><div class="block-title">Pre-class warm-up</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Hip circles, glute bridges</span><span class="ex-sets">2×15</span></li>
+          <li><span class="ex-name">Standing band abduction</span><span class="ex-sets">2×15 each</span></li>
+          <li><span class="ex-name">Calf raises — 3s eccentric</span><span class="ex-sets">2×15</span></li>
+          <li><span class="ex-name">Light shadowboxing</span><span class="ex-sets">3 min</span></li>
+        </ul>
+      </div>
+      <div class="block"><div class="block-title">Muay Thai Fighters Session</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Pad work, bag, technique drills</span><span class="ex-sets">60–90 min</span></li>
+          <li><span class="ex-note">Avoid explosive lateral pivots off the left foot. Switch stance cautiously.</span></li>
+        </ul>
+      </div>
+      <button class="log-session-btn" onclick="openLog(event,'Tuesday — Muay Thai')">+ Log this session</button>
+    </div>
+  </div>
+
+  <div class="day-card gym-sw" onclick="toggle(this)">
+    <div class="day-header">
+      <div class="day-tag">WED</div><div class="day-title">Gym (Lower) + Swim + Office</div>
+      <div class="day-badges"><span class="badge badge-gym2">Gym</span><span class="badge badge-sw">Swim</span><span class="badge badge-walk">Walking</span></div><div class="expand-icon">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="block"><div class="block-title">Strength — Knee-Safe Lower (40 min)</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Barbell / Smith hip thrust</span><span class="ex-sets">4×10–12</span></li>
+          <li><span class="ex-name">Leg press — feet high, max 70°</span><span class="ex-sets">3×12</span></li>
+          <li><span class="ex-note">High foot placement loads glutes/hamstrings, not the knee joint.</span></li>
+          <li><span class="ex-name">Seated leg curl</span><span class="ex-sets">3×12</span></li>
+          <li><span class="ex-name">Cable pull-through</span><span class="ex-sets">3×15</span></li>
+          <li><span class="ex-name">Standing calf raise — slow eccentric</span><span class="ex-sets">3×15</span></li>
+          <li><span class="ex-name">Lateral band walks</span><span class="ex-sets">2×15 each way</span></li>
+        </ul>
+      </div>
+      <div class="block"><div class="block-title">Swim — see Swim Phases tab</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Wednesday role: shorter, gentler session</span><span class="ex-sets">~25–35 min</span></li>
+          <li><span class="ex-note">Legs fatigued from gym — lean into arms, keep it easy. Accumulate water time.</span></li>
+        </ul>
+      </div>
+      <button class="log-session-btn" onclick="openLog(event,'Wednesday — Gym + Swim')">+ Log this session</button>
+    </div>
+  </div>
+
+  <div class="day-card mt" onclick="toggle(this)">
+    <div class="day-header">
+      <div class="day-tag">THU</div><div class="day-title">Muay Thai Fighters</div>
+      <div class="day-badges"><span class="badge badge-mt">Muay Thai</span><span class="badge badge-cycle">Cycling opt.</span></div><div class="expand-icon">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="block"><div class="block-title">Pre-class</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Glute bridges or single-leg bridges</span><span class="ex-sets">3×12</span></li>
+          <li><span class="ex-name">Lateral band walks</span><span class="ex-sets">2×12 each</span></li>
+          <li><span class="ex-name">Light shadowboxing</span><span class="ex-sets">3 min</span></li>
+        </ul>
+      </div>
+      <div class="block"><div class="block-title">Muay Thai Fighters Session</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Fighters session</span><span class="ex-sets">60–90 min</span></li>
+          <li><span class="ex-note">Second MT in 3 days — feeds directly into Friday sparring. Don't grind heavy bag if knees are talking.</span></li>
+        </ul>
+      </div>
+      <button class="log-session-btn" onclick="openLog(event,'Thursday — Muay Thai')">+ Log this session</button>
+    </div>
+  </div>
+
+  <div class="day-card mt" onclick="toggle(this)">
+    <div class="day-header">
+      <div class="day-tag">FRI</div><div class="day-title">Muay Thai Sparring</div>
+      <div class="day-badges"><span class="badge badge-mt">Sparring</span><span class="badge badge-cycle">Cycling opt.</span></div><div class="expand-icon">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="block"><div class="block-title">Pre-sparring</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Full joint circuit — ankles, knees, hips</span><span class="ex-sets">rotations</span></li>
+          <li><span class="ex-name">Shadowboxing with footwork</span><span class="ex-sets">5 min</span></li>
+          <li><span class="ex-name">Light pad or bag rounds</span><span class="ex-sets">2 rounds</span></li>
+        </ul>
+      </div>
+      <div class="block"><div class="block-title">Sparring</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Controlled technical sparring</span><span class="ex-sets">coach-led</span></li>
+          <li><span class="ex-note">Highest knee-risk day. Communicate with partners. Tap out on bad-knee days. Technique over output.</span></li>
+        </ul>
+      </div>
+      <div class="note-box"><strong>Friday rule:</strong> No gym. End of three MT sessions — no additional knee loading.</div>
+      <button class="log-session-btn" onclick="openLog(event,'Friday — Sparring')">+ Log this session</button>
+    </div>
+  </div>
+
+  <div class="day-card sw" onclick="toggle(this)">
+    <div class="day-header">
+      <div class="day-tag">SAT</div><div class="day-title">Swim — Main Endurance Session</div>
+      <div class="day-badges"><span class="badge badge-sw">Swim</span></div><div class="expand-icon">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="block"><div class="block-title">Swim — see Swim Phases tab</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Saturday role: main endurance builder</span><span class="ex-sets">40–55 min</span></li>
+          <li><span class="ex-note">Most important swim session. No gym before it. Saturday is where your swimming fitness compounds week on week.</span></li>
+        </ul>
+      </div>
+      <button class="log-session-btn" onclick="openLog(event,'Saturday — Swim')">+ Log this session</button>
+    </div>
+  </div>
+
+  <div class="day-card gs" onclick="toggle(this)">
+    <div class="day-header">
+      <div class="day-tag">SUN</div><div class="day-title">Gym (Upper) + Swim Flush</div>
+      <div class="day-badges"><span class="badge badge-gym">Gym</span><span class="badge badge-sw">Swim</span></div><div class="expand-icon">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="block"><div class="block-title">Strength — Upper Body (45–50 min)</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">Incline dumbbell press</span><span class="ex-sets">4×8–10</span></li>
+          <li><span class="ex-name">Seated cable row — wide grip</span><span class="ex-sets">4×10</span></li>
+          <li><span class="ex-name">Overhead press — dumbbell</span><span class="ex-sets">3×8</span></li>
+          <li><span class="ex-name">Lat pulldown</span><span class="ex-sets">3×10</span></li>
+          <li><span class="ex-name">Cable face pulls</span><span class="ex-sets">4×15</span></li>
+          <li><span class="ex-name">Rear delt fly</span><span class="ex-sets">3×15</span></li>
+          <li><span class="ex-name">DB curl superset / tricep pushdown</span><span class="ex-sets">3×12 each</span></li>
+        </ul>
+      </div>
+      <div class="block"><div class="block-title">Swim — Active Flush</div>
+        <ul class="ex-list">
+          <li><span class="ex-name">See Swim Phases tab — Sunday session</span><span class="ex-sets">easy, 20–25 min</span></li>
+          <li><span class="ex-note">Not a cardio session. Short, easy, focused on stroke feel.</span></li>
+        </ul>
+      </div>
+      <button class="log-session-btn" onclick="openLog(event,'Sunday — Gym + Swim')">+ Log this session</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB: SWIM PHASES ══ -->
+<div class="panel" id="tab-swim">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:13px;">
+    <div class="widget-title">Your Swimming Progression</div>
+    <p style="font-size:12.5px;color:#9ca3af;line-height:1.6;">You can swim, but one 50m length leaves you gassed. Pool fitness is almost completely separate from any other sport. The goal of weeks 1–6 is simply <strong style="color:var(--text)">to stop fighting the water.</strong> Everything else comes after.</p>
+  </div>
+  <div class="phase-nav">
+    <button class="phase-btn active" onclick="switchPhase('p1',this)">Phase 1<br><span style="opacity:0.6">Wks 1–2</span></button>
+    <button class="phase-btn" onclick="switchPhase('p2',this)">Phase 2<br><span style="opacity:0.6">Wks 3–4</span></button>
+    <button class="phase-btn" onclick="switchPhase('p3',this)">Phase 3<br><span style="opacity:0.6">Wks 5–6</span></button>
+    <button class="phase-btn" onclick="switchPhase('p4',this)">Phase 4<br><span style="opacity:0.6">Wks 7–10</span></button>
+  </div>
+
+  <div class="phase-panel active" id="phase-p1">
+    <div class="phase-header"><h3>Phase 1 — Just Survive</h3><p>Weeks 1–2. Accumulate water time without panic or exhaustion. Rest as long as you need between lengths. No targets, no pace, no pressure.</p><div class="phase-goal">Goal: 8–10 lengths per session with full rest between each</div></div>
+    <div class="section-label">Wednesday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">WED</div><div class="session-title">Water Familiarisation</div><div class="session-meta">~25 min · ~300–400m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Whole session</div><ul class="set-rows"><li><span>Swim 1 length freestyle</span><span>×6–8</span></li><li><span>Rest until fully ready</span><span>no timer</span></li></ul><div class="set-cue">Don't time yourself. Don't push. Rest fully before the next length. The point is repetition in the water. If 6 feels hard, stop at 6.</div></div><div class="set-total">Total: 300–400m</div></div>
+    </div>
+    <div class="section-label" style="margin-top:12px">Saturday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">SAT</div><div class="session-title">Slightly More — Same Approach</div><div class="session-meta">~30 min · ~400–500m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Whole session</div><ul class="set-rows"><li><span>Swim 1 length freestyle</span><span>×8–10</span></li><li><span>Rest until fully ready</span><span>no timer</span></li></ul><div class="set-cue">Fresh — no gym before this. Aim for 2 more lengths than Wednesday. Focus: exhale fully underwater. This is the biggest single fix for breathing panic.</div></div><div class="set-total">Total: 400–500m</div></div>
+    </div>
+    <div class="section-label" style="margin-top:12px">Sunday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">SUN</div><div class="session-title">Post-Gym Easy Flush</div><div class="session-meta">~20 min · ~200–250m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Whole session</div><ul class="set-rows"><li><span>Swim 1 length, very easy</span><span>×4–5</span></li><li><span>Rest as needed</span><span>no rush</span></li></ul><div class="set-cue">Not a cardio session. Focus on stroke feel — long reach, relaxed pull. If you're tired after the gym, 4 lengths and done.</div></div><div class="set-total">Total: 200–250m</div></div>
+    </div>
+    <div class="milestone-bar"><div class="milestone-icon">🎯</div><div class="milestone-text"><h4>Phase 1 → 2 checkpoint</h4><p>10 lengths on Saturday with controlled rest and breathing less frantic than week 1. Both must be true before moving up.</p></div></div>
+  </div>
+
+  <div class="phase-panel" id="phase-p2">
+    <div class="phase-header"><h3>Phase 2 — Link Two Lengths</h3><p>Weeks 3–4. Start linking lengths in pairs. Rest still happens — just every 2 lengths instead of every 1. First real aerobic stimulus.</p><div class="phase-goal">Goal: 12–14 lengths per session in pairs, breathing controlled</div></div>
+    <div class="section-label">Wednesday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">WED</div><div class="session-title">2-Length Blocks</div><div class="session-meta">~30 min · ~500m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Warm-up</div><ul class="set-rows"><li><span>1 length easy</span><span>×2</span></li></ul></div><div class="set-block"><div class="set-label">Main set</div><ul class="set-rows"><li><span>2 lengths freestyle without stopping</span><span>×5</span></li><li><span>Rest between pairs</span><span>45–60s</span></li></ul><div class="set-cue">Key to linking two lengths: slow down. If you're gasping at the 50m wall, you went too hard. Arrive there feeling you could do one more — then rest anyway.</div></div><div class="set-total">Total: ~500m</div></div>
+    </div>
+    <div class="section-label" style="margin-top:12px">Saturday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">SAT</div><div class="session-title">More Pairs + First 150m Attempt</div><div class="session-meta">~35 min · ~650m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Warm-up</div><ul class="set-rows"><li><span>2 lengths easy</span><span>×1</span></li></ul></div><div class="set-block"><div class="set-label">Main set</div><ul class="set-rows"><li><span>2 lengths freestyle</span><span>×6</span></li><li><span>Rest between pairs</span><span>40–50s</span></li></ul></div><div class="set-block"><div class="set-label">Bonus — week 4 only if feeling good</div><ul class="set-rows"><li><span>3 lengths without stopping</span><span>×1</span></li></ul><div class="set-cue">Only attempt if the 2-length sets felt genuinely easy. If it breaks down, note exactly where — that's your current ceiling.</div></div><div class="set-total">Total: ~650m</div></div>
+    </div>
+    <div class="section-label" style="margin-top:12px">Sunday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">SUN</div><div class="session-title">Easy Flush</div><div class="session-meta">~20 min · ~300m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Whole session</div><ul class="set-rows"><li><span>2 lengths easy, rest 30s</span><span>×3</span></li></ul><div class="set-cue">Don't use Sunday to compensate for Saturday. Recovery is part of adaptation.</div></div><div class="set-total">Total: ~300m</div></div>
+    </div>
+    <div class="milestone-bar"><div class="milestone-icon">🎯</div><div class="milestone-text"><h4>Phase 2 → 3 checkpoint</h4><p>6×2 lengths on Saturday with 40s rest, breathing controlled throughout. You've attempted 3 lengths at least once.</p></div></div>
+  </div>
+
+  <div class="phase-panel" id="phase-p3">
+    <div class="phase-header"><h3>Phase 3 — Build to 200m Continuous</h3><p>Weeks 5–6. Extend to 4-length blocks (200m) and start shortening rest. Aerobic system starts visibly responding — adaptation from phases 1–2 now paying off.</p><div class="phase-goal">Goal: 4 lengths (200m) continuous, multiple times per Saturday session</div></div>
+    <div class="section-label">Wednesday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">WED</div><div class="session-title">Threshold Pairs — Tighter Rest</div><div class="session-meta">~32 min · ~625m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Warm-up</div><ul class="set-rows"><li><span>2 lengths easy</span><span>×1</span></li></ul></div><div class="set-block"><div class="set-label">Main set</div><ul class="set-rows"><li><span>2 lengths at moderate effort</span><span>×6</span></li><li><span>Rest between pairs</span><span>30s</span></li></ul><div class="set-cue">Tighter rest than phase 2. Second pair should feel harder than the first — that's the stimulus. Two-beat kick: barely more than keeping your legs level.</div></div><div class="set-total">Total: ~625m</div></div>
+    </div>
+    <div class="section-label" style="margin-top:12px">Saturday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">SAT</div><div class="session-title">4-Length Blocks — 200m Repeats</div><div class="session-meta">~45 min · ~1,000m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Warm-up</div><ul class="set-rows"><li><span>4 lengths easy</span><span>×1</span></li></ul></div><div class="set-block"><div class="set-label">Main set</div><ul class="set-rows"><li><span>4 lengths (200m) continuous</span><span>×4</span></li><li><span>Rest between each 200m</span><span>60s</span></li></ul><div class="set-cue">Pace so that length 3 and 4 still feel possible. If length 3 breaks every time, you're going too hard in lengths 1–2. Deliberately slow down the first length.</div></div><div class="set-block"><div class="set-label">Cool-down</div><ul class="set-rows"><li><span>2 lengths very easy</span><span>×1</span></li></ul></div><div class="set-total">Total: ~1,000m</div></div>
+    </div>
+    <div class="section-label" style="margin-top:12px">Sunday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">SUN</div><div class="session-title">Easy Flush</div><div class="session-meta">~22 min · ~350m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Whole session</div><ul class="set-rows"><li><span>2 lengths easy, rest 30s</span><span>×4</span></li></ul><div class="set-cue">By phase 3, Sunday should start feeling genuinely easy. That's the adaptation working. Keep it easy — resist the urge to push.</div></div><div class="set-total">Total: ~350m</div></div>
+    </div>
+    <div class="milestone-bar"><div class="milestone-icon">🎯</div><div class="milestone-text"><h4>Phase 3 → 4 checkpoint</h4><p>4×200m on Saturday with 60s rest, arriving at each wall under control. You've swum 200m continuously at least 3 times.</p></div></div>
+  </div>
+
+  <div class="phase-panel" id="phase-p4">
+    <div class="phase-header"><h3>Phase 4 — Endurance Engine</h3><p>Weeks 7–10. Interval structures, controlled rest, progressive volume. Saturday becomes your main aerobic engine. This is where the plan compounds week on week.</p><div class="phase-goal">Goal: 10×100m Saturday · Wednesday threshold intervals · Sunday stroke quality</div></div>
+    <div class="section-label">Wednesday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">WED</div><div class="session-title">Threshold Intervals</div><div class="session-meta">~38 min · ~1,000m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Warm-up</div><ul class="set-rows"><li><span>Easy freestyle — long stroke, relaxed breathing</span><span>4×50m</span></li></ul></div><div class="set-block"><div class="set-label">Main set</div><ul class="set-rows"><li><span>100m freestyle at 75–80% effort</span><span>×6</span></li><li><span>Rest between reps</span><span>25–30s</span></li></ul><div class="set-cue">Uncomfortable but sustainable across all 6. Progress: every 2 weeks, cut rest by 5s. Two-beat kick throughout — legs tired from gym anyway.</div></div><div class="set-block"><div class="set-label">Cool-down</div><ul class="set-rows"><li><span>Easy backstroke or freestyle</span><span>150m</span></li></ul></div><div class="set-total">Total: ~1,000m</div></div>
+    </div>
+    <div class="section-label" style="margin-top:12px">Saturday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">SAT</div><div class="session-title">Main Endurance Build</div><div class="session-meta">~60 min · ~1,400m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Warm-up</div><ul class="set-rows"><li><span>Easy freestyle — count strokes per length</span><span>2×100m</span></li></ul><div class="set-cue">Stroke count is your pace anchor. Track it week to week — when the count drops, efficiency is improving.</div></div><div class="set-block"><div class="set-label">Main set</div><ul class="set-rows"><li><span>100m freestyle at 65–70% effort</span><span>×10</span></li><li><span>Rest between reps</span><span>20s</span></li></ul><div class="set-cue">Progress every 2 weeks: reduce rest by 5s. Once at 10s rest, add 2 reps. Never cut rest AND add reps in the same week.</div></div><div class="set-block"><div class="set-label">Cool-down</div><ul class="set-rows"><li><span>Very easy freestyle or backstroke</span><span>200m</span></li></ul></div><div class="set-total">Total: ~1,400m</div></div>
+    </div>
+    <div class="section-label" style="margin-top:12px">Sunday</div>
+    <div class="session-card" onclick="toggleSession(this)"><div class="session-header"><div class="session-day-tag">SUN</div><div class="session-title">Stroke Quality Flush</div><div class="session-meta">~25 min · ~700m</div><div class="session-expand">▾</div></div>
+      <div class="session-body"><div class="set-block"><div class="set-label">Flush + drills</div><ul class="set-rows"><li><span>Easy freestyle</span><span>400m</span></li><li><span>Fingertip drag drill</span><span>4×25m</span></li><li><span>Easy cool-down</span><span>200m</span></li></ul><div class="set-cue">Fingertip drag: drag fingertips along the water surface during arm recovery. Forces high elbow and better catch position — the two biggest efficiency wins in freestyle.</div></div><div class="set-total">Total: ~700m</div></div>
+    </div>
+    <div class="milestone-bar"><div class="milestone-icon">🏊</div><div class="milestone-text"><h4>Beyond Phase 4</h4><p>Once 10×100m with 20s rest feels controlled, you're a swimmer. Add reps, drop rest further, introduce 200m repeats.</p></div></div>
+  </div>
+</div>
+
+<!-- ══ TAB: PROGRESS ══ -->
+<div class="panel" id="tab-progress">
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-number" id="statTotal">0</div><div class="stat-label">Sessions</div></div>
+    <div class="stat-card"><div class="stat-number" id="statStreak">0</div><div class="stat-label">This week</div></div>
+    <div class="stat-card"><div class="stat-number" id="statSwimPhase">1</div><div class="stat-label">Swim phase</div></div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="widget-title">Swimming Distance — Last 8 Sessions</div>
+    <div class="chart-bars" id="swimChart"></div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div class="section-label" style="margin-bottom:0">Session Log</div>
+    <button onclick="clearAllLogs()" style="background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;padding:4px 0;">Clear all</button>
+  </div>
+  <div id="logList"></div>
+</div>
+
+<!-- ══ TAB: PRINCIPLES ══ -->
+<div class="panel" id="tab-principles">
+  <div class="section-label">Knee-Safe Training</div>
+  <div class="principles-grid">
+    <div class="principle-card"><h4>🦵 Two-beat kick only</h4><p>One gentle kick per arm stroke. Reduces knee stress and conserves energy — what endurance swimmers actually use.</p></div>
+    <div class="principle-card"><h4>🚫 No deep knee flexion</h4><p>Leg press stops at 70°. No lunges, full squats, or box jumps. Incompatible with both knees.</p></div>
+    <div class="principle-card"><h4>🏊 Breaststroke banned</h4><p>Whip kick creates valgus torque on the right knee. Freestyle and backstroke only.</p></div>
+    <div class="principle-card"><h4>✅ Posterior chain first</h4><p>Glutes and hamstrings protect both knees. Hip thrusts, leg curls, cable pull-throughs are your vocabulary.</p></div>
+    <div class="principle-card"><h4>🚲 Cycling is fine</h4><p>Flat terrain, high seat, low resistance. Genuinely knee-friendly — good low-impact LISS.</p></div>
+    <div class="principle-card"><h4>⚡ Sharp = stop</h4><p>Aching through effort is normal. Sharpness, clicking with pain, or instability: stop immediately.</p></div>
+  </div>
+  <div class="section-label">Swimming Technique</div>
+  <div class="principles-grid">
+    <div class="principle-card"><h4>💨 Exhale underwater</h4><p>Exhale fully through nose/mouth while face is down, so your inhale when you turn is instant — not frantic.</p></div>
+    <div class="principle-card"><h4>🐢 Slower = easier</h4><p>Fast frantic swimming kills technique. Slow down until breathing is controlled, then gradually build pace.</p></div>
+    <div class="principle-card"><h4>💪 High elbow catch</h4><p>Keep elbow high on entry, pull with forearm and hand together. This is where most propulsion comes from.</p></div>
+    <div class="principle-card"><h4>📏 Long strokes</h4><p>Reach fully forward on entry, pull all the way to your hip. Shorter strokes = more effort, less distance.</p></div>
+  </div>
+  <div class="section-label">Progression Rules</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:15px;">
+    <ul class="ex-list">
+      <li><span class="ex-name">Never cut rest AND add reps same week</span><span class="ex-sets">one change at a time</span></li>
+      <li><span class="ex-name">Reduce Saturday rest by 5s every 2 weeks</span><span class="ex-sets">then add reps</span></li>
+      <li><span class="ex-name">Only progress if session felt controlled — not just completed</span><span class="ex-sets">honest check</span></li>
+      <li><span class="ex-name">Bad week resets to previous week's prescription</span><span class="ex-sets">not a step back</span></li>
+      <li><span class="ex-name">Sunday swim never becomes a cardio session</span><span class="ex-sets">ever</span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openLog(null,'Quick Log')">+</button>
+
+<!-- LOG MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Log Session</div>
+    <div class="modal-sub">Record how it went</div>
+    <div class="form-row">
+      <label class="form-label">Session</label>
+      <select class="form-select" id="logType">
+        <option>Monday — Rest</option>
+        <option>Tuesday — Muay Thai</option>
+        <option>Wednesday — Gym + Swim</option>
+        <option>Thursday — Muay Thai</option>
+        <option>Friday — Sparring</option>
+        <option>Saturday — Swim</option>
+        <option>Sunday — Gym + Swim</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Date</label>
+      <input class="form-input" type="date" id="logDate">
+    </div>
+    <div class="form-row" id="swimDistRow">
+      <label class="form-label">Distance swum (m) — if swim session</label>
+      <input class="form-input" type="number" id="logSwimDist" placeholder="e.g. 400" min="0" max="5000">
+    </div>
+    <div class="form-row">
+      <label class="form-label">How did it feel?</label>
+      <div class="rating-row">
+        <button class="rating-btn" onclick="setRating(1,this)">😵</button>
+        <button class="rating-btn" onclick="setRating(2,this)">😤</button>
+        <button class="rating-btn" onclick="setRating(3,this)">😐</button>
+        <button class="rating-btn" onclick="setRating(4,this)">💪</button>
+        <button class="rating-btn" onclick="setRating(5,this)">🔥</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Knee check</label>
+      <select class="form-select" id="logKnee">
+        <option value="fine">Fine — no issues</option>
+        <option value="ache">Some aching — manageable</option>
+        <option value="sharp">Sharp pain — had to modify</option>
+        <option value="stopped">Stopped early</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Notes (optional)</label>
+      <textarea class="form-textarea" id="logNotes" placeholder="How it went, what you noticed, anything to remember..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveLog()">Save Session</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let selectedRating = 0;
+let logs = [];
+
+const STORAGE_KEY = 'jack_training_logs';
+const PHASE_KEY = 'jack_swim_phase';
+
+function saveLogs() { localStorage.setItem(STORAGE_KEY, JSON.stringify(logs)); }
+function loadLogs() {
+  try { logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { logs = []; }
+}
+function savePhase(p) { localStorage.setItem(PHASE_KEY, p); }
+function loadPhase() { return parseInt(localStorage.getItem(PHASE_KEY) || '1'); }
+
+// ── TABS ──
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'progress') renderProgress();
+}
+
+function switchPhase(id, btn) {
+  document.querySelectorAll('.phase-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('phase-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggle(card) { card.classList.toggle('open'); }
+function toggleSession(card) { card.classList.toggle('open'); }
+
+// ── LOG MODAL ──
+function openLog(e, sessionName) {
+  if (e) e.stopPropagation();
+  document.getElementById('logType').value = sessionName || 'Tuesday — Muay Thai';
+  document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('logNotes').value = '';
+  document.getElementById('logSwimDist').value = '';
+  document.getElementById('logKnee').value = 'fine';
+  selectedRating = 0;
+  document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+function setRating(r, btn) {
+  selectedRating = r;
+  document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function saveLog() {
+  const type = document.getElementById('logType').value;
+  const date = document.getElementById('logDate').value;
+  const notes = document.getElementById('logNotes').value.trim();
+  const knee = document.getElementById('logKnee').value;
+  const dist = parseInt(document.getElementById('logSwimDist').value) || 0;
+  if (!date) { alert('Please pick a date.'); return; }
+  const entry = { id: Date.now(), type, date, notes, knee, rating: selectedRating, swimDist: dist };
+  logs.unshift(entry);
+  saveLogs();
+  closeModal();
+  renderProgress();
+}
+
+function deleteLog(id) {
+  logs = logs.filter(l => l.id !== id);
+  saveLogs();
+  renderProgress();
+}
+
+function clearAllLogs() {
+  if (confirm('Delete all logged sessions?')) { logs = []; saveLogs(); renderProgress(); }
+}
+
+// ── PROGRESS RENDER ──
+const kneeLabels = { fine: '✅ Knees fine', ache: '🟡 Some aching', sharp: '🔴 Sharp pain', stopped: '⛔ Stopped early' };
+const kneeColors = { fine: 'var(--green)', ache: 'var(--amber)', sharp: '#ef4444', stopped: '#ef4444' };
+const ratingEmoji = ['','😵','😤','😐','💪','🔥'];
+
+function typeColor(type) {
+  if (type.includes('Muay') || type.includes('Sparring')) return { bg: 'var(--amber-dim)', c: 'var(--amber)' };
+  if (type.includes('Swim') && !type.includes('Gym')) return { bg: 'var(--teal-dim)', c: 'var(--teal)' };
+  if (type.includes('Gym') && type.includes('Swim')) return { bg: 'var(--purple-dim)', c: 'var(--purple)' };
+  if (type.includes('Gym')) return { bg: 'var(--green-dim)', c: 'var(--green)' };
+  return { bg: 'var(--slate-dim)', c: 'var(--slate)' };
+}
+
+function formatDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+function thisWeekCount() {
+  const now = new Date();
+  const start = new Date(now);
+  start.setDate(now.getDate() - now.getDay());
+  start.setHours(0,0,0,0);
+  return logs.filter(l => new Date(l.date + 'T00:00:00') >= start).length;
+}
+
+function renderProgress() {
+  loadLogs();
+  const phase = loadPhase();
+  document.getElementById('statTotal').textContent = logs.length;
+  document.getElementById('statStreak').textContent = thisWeekCount();
+  document.getElementById('statSwimPhase').textContent = phase;
+
+  // Swim chart
+  const swimLogs = logs.filter(l => l.swimDist > 0).slice(0, 8).reverse();
+  const chartEl = document.getElementById('swimChart');
+  if (swimLogs.length === 0) {
+    chartEl.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;">No swim data yet</div>';
+  } else {
+    const maxDist = Math.max(...swimLogs.map(l => l.swimDist), 1);
+    chartEl.innerHTML = swimLogs.map(l => `
+      <div class="chart-bar-col">
+        <div class="chart-bar-fill" style="height:${Math.max((l.swimDist/maxDist)*100,4)}%"></div>
+        <div class="chart-bar-lbl">${l.swimDist}m</div>
+      </div>`).join('');
+  }
+
+  // Log list
+  const listEl = document.getElementById('logList');
+  if (logs.length === 0) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No sessions logged yet.<br>Tap <strong>+</strong> or use the "Log this session" button inside any day.</p></div>`;
+    return;
+  }
+  listEl.innerHTML = logs.map(l => {
+    const col = typeColor(l.type);
+    const kc = kneeColors[l.knee] || 'var(--muted)';
+    return `<div class="log-entry">
+      <div class="log-entry-header">
+        <div class="log-entry-title">${l.type}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="log-entry-date">${formatDate(l.date)}</div>
+          <button class="log-delete" onclick="deleteLog(${l.id})">✕</button>
+        </div>
+      </div>
+      <div class="log-entry-meta">
+        <span class="log-tag" style="background:${col.bg};color:${col.c}">${l.type.split('—')[1]?.trim() || l.type}</span>
+        ${l.rating ? `<span style="font-size:14px">${ratingEmoji[l.rating]}</span>` : ''}
+        ${l.swimDist ? `<span class="log-tag" style="background:var(--teal-dim);color:var(--teal)">${l.swimDist}m</span>` : ''}
+        <span style="font-size:11px;color:${kc}">${kneeLabels[l.knee]}</span>
+      </div>
+      ${l.notes ? `<div class="log-notes">${l.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── LOAD BARS ──
+const days = [
+  { label: 'MON', height: 6,  color: 'var(--slate)' },
+  { label: 'TUE', height: 55, color: 'var(--amber)' },
+  { label: 'WED', height: 68, color: 'var(--purple)' },
+  { label: 'THU', height: 50, color: 'var(--amber)' },
+  { label: 'FRI', height: 58, color: '#ef4444' },
+  { label: 'SAT', height: 45, color: 'var(--teal)' },
+  { label: 'SUN', height: 70, color: 'var(--green)' },
+];
+const container = document.getElementById('loadBars');
+days.forEach(d => {
+  container.innerHTML += `<div class="load-bar-wrap">
+    <div class="load-bar" style="height:${d.height}%;background:${d.color};opacity:0.82"></div>
+    <div class="load-day-label">${d.label}</div>
+  </div>`;
+});
+
+// ── INIT ──
+loadLogs();
+renderProgress();
+</script>
+</body>
+</html>
