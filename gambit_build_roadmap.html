@@ -1,0 +1,247 @@
+
+<h2 class="sr-only">Gambit Group full build roadmap from session 1 through to live product with milestones</h2>
+<style>
+  .r-root{font-family:var(--font-sans);padding:2rem 0}
+  .r-section{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin:2rem 0 1rem}
+  .r-divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:1.5rem 0}
+  .r-badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:var(--border-radius-md);margin:0 4px 4px 0}
+  .r-teal{background:#E1F5EE;color:#0F6E56}
+  .r-purple{background:#EEEDFE;color:#3C3489}
+  .r-amber{background:#FAEEDA;color:#854F0B}
+  .r-coral{background:#FAECE7;color:#993C1D}
+  .r-gray{background:#F1EFE8;color:#5F5E5A}
+  .r-blue{background:var(--color-background-info);color:var(--color-text-info)}
+  .r-green{background:#EAF3DE;color:#3B6D11}
+  .r-phase-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem}
+  .r-phase-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0}
+  .r-phase-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+  .r-phase-sub{font-size:12px;color:var(--color-text-tertiary)}
+  .r-session{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:10px}
+  .r-session-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:0.5rem;flex-wrap:wrap}
+  .r-session-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+  .r-session-time{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap}
+  .r-session-body{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:0.5rem}
+  .r-deliverable{font-size:12px;color:var(--color-text-success);font-weight:500}
+  .r-milestone{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.6rem 1rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .r-milestone-icon{font-size:14px;color:var(--color-text-tertiary)}
+  .r-milestone-text{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+  .r-milestone-text strong{font-weight:500;color:var(--color-text-primary)}
+  .r-warn{background:var(--color-background-warning);border-radius:var(--border-radius-md);padding:0.6rem 1rem;margin-bottom:6px}
+  .r-warn-text{font-size:12px;color:var(--color-text-warning);line-height:1.5}
+  .r-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+</style>
+
+<div class="r-root">
+
+<div style="margin-bottom:2rem">
+  <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:0.5rem">Gambit — build roadmap</div>
+  <div style="font-size:24px;font-weight:500;color:var(--color-text-primary);margin:0 0 0.4rem">From prototype to live product</div>
+  <div style="font-size:13px;color:var(--color-text-secondary)">Claude Max + Claude Code in VSCode. No coding experience needed.</div>
+</div>
+
+<div class="r-divider"></div>
+
+<div class="r-section">Phase 1 — prove the format</div>
+<div style="margin-bottom:1.5rem">
+  <div class="r-phase-header">
+    <div class="r-phase-num" style="background:#E1F5EE;color:#0F6E56">1</div>
+    <div><div class="r-phase-title">Web2 prototype — Locker</div><div class="r-phase-sub">Week 1 — one Saturday morning</div></div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 1 — Locker prototype</div>
+      <div class="r-session-time">4-5 hrs</div>
+    </div>
+    <div class="r-session-body">Next.js scaffold, Liar's Dice engine, real-time multiplayer layer, player UI, spectator and betting UI, pool mechanics, prize pot logic, full local playtest.</div>
+    <div class="r-deliverable">Deliverable: working game running locally across 7 browser tabs</div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 2 — polish and deploy</div>
+      <div class="r-session-time">3-4 hrs</div>
+    </div>
+    <div class="r-session-body">Fix session 1 issues. Improve UI — dark theme, animations, pool size counters, dice visuals. Deploy to Vercel — public URL, accessible from any device. Basic lobby flow, waiting room, session timer.</div>
+    <div class="r-deliverable">Deliverable: live URL you can send to anyone</div>
+  </div>
+
+  <div class="r-milestone"><i class="ti ti-flag r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 1:</strong> send the URL to 5 people you trust. Watch them play. Note every moment of confusion or delight.</div></div>
+</div>
+
+<div style="margin-bottom:1.5rem">
+  <div class="r-phase-header">
+    <div class="r-phase-num" style="background:#E1F5EE;color:#0F6E56">2</div>
+    <div><div class="r-phase-title">Streamer proof of concept</div><div class="r-phase-sub">Week 2-3</div></div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 3 — stream overlay and spectator UX</div>
+      <div class="r-session-time">3-4 hrs</div>
+    </div>
+    <div class="r-session-body">Build a clean stream-ready spectator view — large pool size displays, animated chip flows, claim history ticker, player dice display formatted for screen capture. OBS-compatible overlay layer.</div>
+    <div class="r-deliverable">Deliverable: spectator view that looks good on a Twitch stream</div>
+  </div>
+
+  <div class="r-milestone"><i class="ti ti-brand-twitch r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 2:</strong> recruit one mid-tier crypto or gaming streamer. Run a live session on stream. Capture the clip.</div></div>
+  <div class="r-milestone"><i class="ti ti-video r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 3:</strong> the clip exists. This is your proof of concept for every conversation that follows — operators, investors, press.</div></div>
+</div>
+
+<div class="r-divider"></div>
+
+<div class="r-section">Phase 2 — go on-chain</div>
+<div style="margin-bottom:1.5rem">
+  <div class="r-phase-header">
+    <div class="r-phase-num" style="background:#EEEDFE;color:#3C3489">3</div>
+    <div><div class="r-phase-title">Web3 migration — Locker on-chain</div><div class="r-phase-sub">Week 3-4</div></div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 4 — smart contract</div>
+      <div class="r-session-time">4-5 hrs</div>
+    </div>
+    <div class="r-session-body">Write the pool mechanics smart contract in Solidity — commit to pool, distribute pari-mutuel, deduct rake, send to prize pot, settle on round end. Deploy to testnet (Sepolia). Test every scenario with fake ETH.</div>
+    <div class="r-deliverable">Deliverable: pool contract running on testnet, every payout verifiable on-chain</div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 5 — wallet connection</div>
+      <div class="r-session-time">3-4 hrs</div>
+    </div>
+    <div class="r-session-body">wagmi + ConnectKit for wallet connection. Replace virtual chip balances with wallet reads. Pool commits become contract calls. Prize pot distributions become on-chain transfers. Web2 pool logic abstraction pays off here — swap the layer, not the game.</div>
+    <div class="r-deliverable">Deliverable: real crypto flowing through Locker on testnet</div>
+  </div>
+
+  <div class="r-warn"><div class="r-warn-text">Before mainnet: one-hour consultation with a crypto-friendly gaming lawyer. Confirm skill-based pari-mutuel classification in your target jurisdiction. Low risk at this stage but worth having on record.</div></div>
+
+  <div class="r-milestone"><i class="ti ti-shield-check r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 4:</strong> legal review complete. Green light for mainnet deployment.</div></div>
+  <div class="r-milestone"><i class="ti ti-currency-ethereum r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 5:</strong> Locker live on mainnet with real crypto pools. Gambit is a real product.</div></div>
+</div>
+
+<div style="margin-bottom:1.5rem">
+  <div class="r-phase-header">
+    <div class="r-phase-num" style="background:#EEEDFE;color:#3C3489">4</div>
+    <div><div class="r-phase-title">Ruse — second game</div><div class="r-phase-sub">Week 4-5</div></div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 6 — Ruse build</div>
+      <div class="r-session-time">3-4 hrs</div>
+    </div>
+    <div class="r-session-body">Signal game mechanic on top of Locker infrastructure. New game logic module, new player and spectator UI skins, same lobby, same pool contracts, same prize pot logic. Fastest build in the portfolio.</div>
+    <div class="r-deliverable">Deliverable: two games live on Gambit</div>
+  </div>
+
+  <div class="r-milestone"><i class="ti ti-layout-grid r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 6:</strong> Gambit has a lobby with two distinct games. Platform feel established.</div></div>
+</div>
+
+<div class="r-divider"></div>
+
+<div class="r-section">Phase 3 — community and Defect</div>
+<div style="margin-bottom:1.5rem">
+  <div class="r-phase-header">
+    <div class="r-phase-num" style="background:#FAEEDA;color:#854F0B">5</div>
+    <div><div class="r-phase-title">Community infrastructure</div><div class="r-phase-sub">Month 2</div></div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 7 — player profiles and leaderboards</div>
+      <div class="r-session-time">3-4 hrs</div>
+    </div>
+    <div class="r-session-body">Persistent player identities — wallet-linked profiles, session history, win rates, prize pot earnings. Public leaderboards. The foundation for skilled regulars becoming known figures the crowd bets around.</div>
+    <div class="r-deliverable">Deliverable: players have a reason to keep coming back and a reputation to build</div>
+  </div>
+
+  <div class="r-milestone"><i class="ti ti-brand-discord r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 7:</strong> Discord server live. Crypto Twitter presence active. First 100 real users in the community.</div></div>
+</div>
+
+<div style="margin-bottom:1.5rem">
+  <div class="r-phase-header">
+    <div class="r-phase-num" style="background:#FAEEDA;color:#854F0B">6</div>
+    <div><div class="r-phase-title">Defect — live event format</div><div class="r-phase-sub">Month 2-3</div></div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 8 — Defect game engine</div>
+      <div class="r-session-time">5-6 hrs</div>
+    </div>
+    <div class="r-session-body">Role assignment, discussion phase timer, nomination mechanic, voting logic, elimination, win condition. Separate build from Locker/Ruse — different session architecture. Face-cam integration prep.</div>
+    <div class="r-deliverable">Deliverable: Defect game engine running locally</div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 9 — Defect UI and stream format</div>
+      <div class="r-session-time">4-5 hrs</div>
+    </div>
+    <div class="r-session-body">Dossier-style player cards, accusation feed, voting interface, nomination pool UI, stream overlay. Scheduled event system — recurring weekly slot in the lobby calendar.</div>
+    <div class="r-deliverable">Deliverable: Defect ready for first live streamer session</div>
+  </div>
+
+  <div class="r-milestone"><i class="ti ti-calendar-event r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 8:</strong> first Defect live event. Streamer anchored, community betting in real time. The biggest content moment so far.</div></div>
+</div>
+
+<div class="r-divider"></div>
+
+<div class="r-section">Phase 4 — Gambit casino upgrade</div>
+<div style="margin-bottom:1.5rem">
+  <div class="r-phase-header">
+    <div class="r-phase-num" style="background:#FAECE7;color:#993C1D">7</div>
+    <div><div class="r-phase-title">Licensed casino</div><div class="r-phase-sub">Year 1-2 — when model is proven</div></div>
+  </div>
+
+  <div class="r-session">
+    <div class="r-session-header">
+      <div class="r-session-title">Session 10+ — fiat integration and casino layer</div>
+      <div class="r-session-time">Ongoing</div>
+    </div>
+    <div class="r-session-body">Stripe or payment processor for fiat on-ramp. KYC integration. Responsible gambling tooling. Curaçao licence application in parallel. Full casino UI upgrade — account management, deposit/withdrawal, transaction history.</div>
+    <div class="r-deliverable">Deliverable: Gambit is a licensed casino with a proven community already inside it</div>
+  </div>
+
+  <div class="r-milestone"><i class="ti ti-certificate r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 9:</strong> Curaçao licence granted. Real money, full product, licensed operation.</div></div>
+  <div class="r-milestone"><i class="ti ti-building-store r-milestone-icon" aria-hidden="true"></i><div class="r-milestone-text"><strong>Milestone 10:</strong> operator licensing conversations — inbound by this point. Tells licenses the format to third parties from a position of proven traction.</div></div>
+</div>
+
+<div class="r-divider"></div>
+
+<div class="r-section">Summary timeline</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem">
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem">
+    <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px">Week 1</div>
+    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Locker prototype live</div>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem">
+    <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px">Week 2-3</div>
+    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">First stream clip</div>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem">
+    <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px">Week 4</div>
+    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">On-chain mainnet</div>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem">
+    <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px">Month 2</div>
+    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Ruse + community</div>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem">
+    <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px">Month 3</div>
+    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Defect live event</div>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem">
+    <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px">Year 1-2</div>
+    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Gambit casino</div>
+  </div>
+</div>
+
+<div style="padding:1rem;background:var(--color-background-secondary);border-radius:var(--border-radius-md);text-align:center">
+  <button onclick="sendPrompt('Help me set up Claude Code in VSCode and get ready for session 1')" style="font-size:13px;margin:4px">Set up VSCode now ↗</button>
+  <button onclick="sendPrompt('Start session 1 — scaffold the Locker project')" style="font-size:13px;margin:4px">Start session 1 ↗</button>
+</div>
+
+</div>
